@@ -146,7 +146,53 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        value, action = self.minimax(gameState, 0, self.depth)
+        return action
+        # util.raiseNotDefined()
+
+    def minimax(self, gameState, agentIndex, depth):
+        if gameState.isWin() or gameState.isLose() or depth == 0:
+            return self.evaluationFunction(gameState), Directions.STOP
+        if agentIndex == 0:
+            return self.max_value(gameState, agentIndex, depth)
+        else:
+            return self.min_value(gameState, agentIndex, depth)
+
+    def min_value(self, gameState, agentIndex, depth):
+        legalActions = gameState.getLegalActions(agentIndex)
+        if agentIndex == gameState.getNumAgents() - 1:
+            nextAgentIndex = 0
+            nextDepth = depth - 1
+        else:
+            nextAgentIndex = agentIndex + 1
+            nextDepth = depth
+        minVal = float('inf')
+        minAction = None
+        for action in legalActions:
+            nextGameState = gameState.generateSuccessor(agentIndex, action)
+            val, _ = self.minimax(nextGameState, nextAgentIndex, nextDepth)
+            if val < minVal:
+                minVal = val
+                minAction = action
+        return minVal, minAction
+
+    def max_value(self, gameState, agentIndex, depth):
+        legalActions = gameState.getLegalActions(agentIndex)
+        if agentIndex == gameState.getNumAgents() - 1:
+            nextAgentIndex = 0
+            nextDepth = depth - 1
+        else:
+            nextAgentIndex = agentIndex + 1
+            nextDepth = depth
+        maxVal = float('-inf')
+        maxAction = None
+        for action in legalActions:
+            nextGameState = gameState.generateSuccessor(agentIndex, action)
+            val, _ = self.minimax(nextGameState, nextAgentIndex, nextDepth)
+            if val > maxVal:
+                maxVal = val
+                maxAction = action
+        return maxVal, maxAction
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
