@@ -271,7 +271,51 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        value, action = self.expectimax(gameState, 0, self.depth)
+        return action
+        # util.raiseNotDefined()
+
+    def expectimax(self, gameState, agentIndex, depth):
+        if gameState.isWin() or gameState.isLose() or depth == 0:
+            return self.evaluationFunction(gameState), Directions.STOP
+        if agentIndex == 0:
+            return self.max_value(gameState, agentIndex, depth)
+        else:
+            return self.exp_value(gameState, agentIndex, depth)
+
+    def max_value(self, gameState, agentIndex, depth):
+        legalActions = gameState.getLegalActions(agentIndex)
+        if agentIndex == gameState.getNumAgents() - 1:
+            nextAgentIndex = 0
+            nextDepth = depth - 1
+        else:
+            nextAgentIndex = agentIndex + 1
+            nextDepth = depth
+        maxVal = float('-inf')
+        maxAction = None
+        for action in legalActions:
+            nextGameState = gameState.generateSuccessor(agentIndex, action)
+            val, _ = self.expectimax(nextGameState, nextAgentIndex, nextDepth)
+            if val > maxVal:
+                maxVal = val
+                maxAction = action
+        return maxVal, maxAction
+
+    def exp_value(self, gameState, agentIndex, depth):
+        legalActions = gameState.getLegalActions(agentIndex)
+        if agentIndex == gameState.getNumAgents() - 1:
+            nextAgentIndex = 0
+            nextDepth = depth - 1
+        else:
+            nextAgentIndex = agentIndex + 1
+            nextDepth = depth
+        sumVal = 0
+        for action in legalActions:
+            nextGameState = gameState.generateSuccessor(agentIndex, action)
+            val, _ = self.expectimax(nextGameState, nextAgentIndex, nextDepth)
+            sumVal += val
+        avgVal = sumVal / len(legalActions)
+        return avgVal, None
 
 def betterEvaluationFunction(currentGameState):
     """
